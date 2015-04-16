@@ -1,4 +1,4 @@
-package extimplement;
+package doext.implement;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,7 +19,7 @@ import core.interfaces.DoIPageView;
 import core.interfaces.DoIScriptEngine;
 import core.object.DoInvokeResult;
 import core.object.DoSingletonModule;
-import extdefine.do_Camera_IMethod;
+import doext.define.do_Camera_IMethod;
 
 /**
  * 自定义扩展SM组件Model实现，继承DoSingletonModule抽象类，并实现Do_Camera_IMethod接口方法；
