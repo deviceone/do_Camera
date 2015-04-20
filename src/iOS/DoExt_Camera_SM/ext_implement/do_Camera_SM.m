@@ -7,6 +7,8 @@
 //
 
 #import "do_Camera_SM.h"
+#import <AVFoundation/AVFoundation.h>
+#import <MobileCoreServices/UTCoreTypes.h>
 
 #import "doJsonNode.h"
 #import "doServiceContainer.h"
@@ -23,6 +25,7 @@
     int imageHeight;
     int imageQuality;
     BOOL isCut;
+    UIImagePickerController * pickerVC;
 }
 @property (nonatomic, strong) NSString * myCallbackFuncName;
 @property (nonatomic, strong) doInvokeResult * myInvokeResult;
@@ -35,30 +38,30 @@
 #pragma mark - 同步异步方法的实现
 /*
  1.参数节点
-     doJsonNode *_dictParas = [parms objectAtIndex:0];
-     在节点中，获取对应的参数
-     NSString *title = [_dictParas GetOneText:@"title" :@"" ];
-     说明：第一个参数为对象名，第二为默认值
+ doJsonNode *_dictParas = [parms objectAtIndex:0];
+ 在节点中，获取对应的参数
+ NSString *title = [_dictParas GetOneText:@"title" :@"" ];
+ 说明：第一个参数为对象名，第二为默认值
  
  2.脚本运行时的引擎
-     id<doIScriptEngine> _scritEngine = [parms objectAtIndex:1];
+ id<doIScriptEngine> _scritEngine = [parms objectAtIndex:1];
  
  同步：
  3.同步回调对象(有回调需要添加如下代码)
-     doInvokeResult *_invokeResult = [parms objectAtIndex:2];
-     回调信息
-     如：（回调一个字符串信息）
-     [_invokeResult SetResultText:((doUIModule *)_model).UniqueKey];
+ doInvokeResult *_invokeResult = [parms objectAtIndex:2];
+ 回调信息
+ 如：（回调一个字符串信息）
+ [_invokeResult SetResultText:((doUIModule *)_model).UniqueKey];
  异步：
  3.获取回调函数名(异步方法都有回调)
-     NSString *_callbackName = [parms objectAtIndex:2];
-     在合适的地方进行下面的代码，完成回调
-     新建一个回调对象
-     doInvokeResult *_invokeResult = [[doInvokeResult alloc] init];
-     填入对应的信息
-     如：（回调一个字符串）
-     [_invokeResult SetResultText: @"异步方法完成"];
-     [_scritEngine Callback:_callbackName :_invokeResult];
+ NSString *_callbackName = [parms objectAtIndex:2];
+ 在合适的地方进行下面的代码，完成回调
+ 新建一个回调对象
+ doInvokeResult *_invokeResult = [[doInvokeResult alloc] init];
+ 填入对应的信息
+ 如：（回调一个字符串）
+ [_invokeResult SetResultText: @"异步方法完成"];
+ [_scritEngine Callback:_callbackName :_invokeResult];
  */
 #pragma mark - 实现异步方法
 - (void)capture:(NSArray *)params
@@ -78,29 +81,56 @@
     //是否启动中间裁剪界面
     isCut = [_dicParas GetOneBoolean:@"iscut" :NO];
     
-    if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]){
-        UIImagePickerController * pickerVC = [[UIImagePickerController alloc]init];
-        pickerVC.delegate = self;
-        
-        pickerVC.sourceType = UIImagePickerControllerSourceTypeCamera;
-        if(isCut)
-        {
-            pickerVC.allowsEditing = YES;
-            pickerVC.showsCameraControls = YES;
+    if(pickerVC == nil)
+    {
+        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]){
+            
+            if ([[AVCaptureDevice class] respondsToSelector:@selector(authorizationStatusForMediaType:)]) {
+                AVAuthorizationStatus authorizationStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+                if (authorizationStatus == AVAuthorizationStatusRestricted
+                    || authorizationStatus == AVAuthorizationStatusDenied) {
+                    // 没有权限
+                    [[doServiceContainer Instance].LogEngine WriteError:nil:@"当前设备不支持相机功能",nil];
+                    return;
+                }
+            }
+            
+            pickerVC = [[UIImagePickerController alloc]init];
+            pickerVC.delegate = self;
+            NSString *requiredMediaType = ( NSString *)kUTTypeImage;
+            //        NSString *requiredMediaType1 = ( NSString *)kUTTypeMovie;
+            NSArray *arrMediaTypes=[NSArray arrayWithObjects:requiredMediaType,nil];
+            [pickerVC setMediaTypes:arrMediaTypes];
+            //            [pickerVC setShowsCameraControls:YES];
+            [pickerVC setSourceType:UIImagePickerControllerSourceTypeCamera];
+            //            [pickerVC setCameraDevice:UIImagePickerControllerCameraDeviceRear];
+            [pickerVC setCameraFlashMode:UIImagePickerControllerCameraFlashModeOff];
+            [self presentViewController];
+        }else{
+            [[doServiceContainer Instance].LogEngine WriteError:nil:@"当前设备不支持相机功能",nil];
         }
-        pickerVC.cameraDevice = UIImagePickerControllerCameraDeviceRear;
-        pickerVC.cameraFlashMode = UIImagePickerControllerCameraFlashModeAuto;
-        
-        pickerVC.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypeCamera];
-        
-        id<doIPage> pageModel = _myScriptEngine.CurrentPage;
-        UIViewController * currentVC = (UIViewController *)pageModel.PageView;
+    }
+    else
+    {
+        [self presentViewController];
+    }
+}
+
+- (void)presentViewController
+{
+    if(isCut)
+        [pickerVC setAllowsEditing:YES];
+    else
+        [pickerVC setAllowsEditing:NO];
+    id<doIPage> pageModel = _myScriptEngine.CurrentPage;
+    UIViewController * currentVC = (UIViewController *)pageModel.PageView;
+    // 更改UI的操作，必须回到主线程
+    dispatch_async(dispatch_get_main_queue(), ^{
         [currentVC presentViewController:pickerVC animated:YES completion:^{
             NSLog(@"跳转成功!");
         }];
-    }else{
-        [[doServiceContainer Instance].LogEngine WriteError:nil:@"当前设备不支持相机功能",nil];
-    }
+    });
+    
 }
 
 #pragma mark - 私有方法，支持对外方法的实现
