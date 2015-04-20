@@ -15,6 +15,7 @@
 #import "doILogEngine.h"
 #import "doIApp.h"
 #import "doISourceFS.h"
+#import "doIDataFS.h"
 #import "doIOHelper.h"
 #import "doCallBackTask.h"
 #import "doIPage.h"
@@ -167,11 +168,13 @@
             image = [UIImage imageWithData:imageData];
             
             //写入本地
-            NSString * sourceFSRootPath = _myScriptEngine.CurrentApp.SourceFS.RootPath;
+            NSString * dataFSRootPath = _myScriptEngine.CurrentApp.DataFS.RootPath;
             NSString * fileName = [NSString stringWithFormat:@"%@.png",[doUIModuleHelper stringWithUUID]];
-            NSString * filePath = [NSString stringWithFormat:@"%@/%@",sourceFSRootPath,fileName];
-            
-            [doIOHelper WriteAllBytes:filePath :imageData];
+            NSString * filePath = [NSString stringWithFormat:@"%@/temp",dataFSRootPath];
+            NSString * fileFullName = [NSString stringWithFormat:@"%@/%@",filePath,fileName];
+            if(![doIOHelper ExistDirectory:filePath])
+                [doIOHelper CreateDirectory:filePath];
+            [doIOHelper WriteAllBytes:fileFullName :imageData];
             [_myInvokeResult SetResultText:[NSString stringWithFormat:@"data://temp/%@",fileName]];
         }
         @catch (NSException *exception) {
