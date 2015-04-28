@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.provider.MediaStore;
 import core.DoServiceContainer;
 import core.helper.DoIOHelper;
@@ -25,55 +26,53 @@ import doext.define.do_Camera_IMethod;
  * 自定义扩展SM组件Model实现，继承DoSingletonModule抽象类，并实现Do_Camera_IMethod接口方法；
  * #如何调用组件自定义事件？可以通过如下方法触发事件：
  * this.model.getEventCenter().fireEvent(_messageName, jsonResult);
- * 参数解释：@_messageName字符串事件名称，@jsonResult传递事件参数对象；
- * 获取DoInvokeResult对象方式new DoInvokeResult(this.getUniqueKey());
+ * 参数解释：@_messageName字符串事件名称，@jsonResult传递事件参数对象； 获取DoInvokeResult对象方式new
+ * DoInvokeResult(this.getUniqueKey());
  */
-public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMethod{
+public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMethod {
 
 	public do_Camera_Model() throws Exception {
 		super();
 	}
-	
+
 	/**
 	 * 同步方法，JS脚本调用该组件对象方法时会被调用，可以根据_methodName调用相应的接口实现方法；
+	 * 
 	 * @_methodName 方法名称
 	 * @_dictParas 参数（K,V）
 	 * @_scriptEngine 当前Page JS上下文环境对象
 	 * @_invokeResult 用于返回方法结果对象
 	 */
 	@Override
-	public boolean invokeSyncMethod(String _methodName, DoJsonNode _dictParas,
-			DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult)
-			throws Exception {
-		//...do something
+	public boolean invokeSyncMethod(String _methodName, DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
+		// ...do something
 		return super.invokeSyncMethod(_methodName, _dictParas, _scriptEngine, _invokeResult);
 	}
-	
+
 	/**
-	 * 异步方法（通常都处理些耗时操作，避免UI线程阻塞），JS脚本调用该组件对象方法时会被调用，
-	 * 可以根据_methodName调用相应的接口实现方法；
+	 * 异步方法（通常都处理些耗时操作，避免UI线程阻塞），JS脚本调用该组件对象方法时会被调用， 可以根据_methodName调用相应的接口实现方法；
+	 * 
 	 * @_methodName 方法名称
 	 * @_dictParas 参数（K,V）
 	 * @_scriptEngine 当前page JS上下文环境
-	 * @_callbackFuncName 回调函数名
-	 * #如何执行异步方法回调？可以通过如下方法：
-	 * _scriptEngine.callback(_callbackFuncName, _invokeResult);
-	 * 参数解释：@_callbackFuncName回调函数名，@_invokeResult传递回调函数参数对象；
-	 * 获取DoInvokeResult对象方式new DoInvokeResult(this.getUniqueKey());
+	 * @_callbackFuncName 回调函数名 #如何执行异步方法回调？可以通过如下方法：
+	 *                    _scriptEngine.callback(_callbackFuncName,
+	 *                    _invokeResult);
+	 *                    参数解释：@_callbackFuncName回调函数名，@_invokeResult传递回调函数参数对象；
+	 *                    获取DoInvokeResult对象方式new
+	 *                    DoInvokeResult(this.getUniqueKey());
 	 */
 	@Override
-	public boolean invokeAsyncMethod(String _methodName, DoJsonNode _dictParas,
-			DoIScriptEngine _scriptEngine, String _callbackFuncName)throws Exception {
+	public boolean invokeAsyncMethod(String _methodName, DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, String _callbackFuncName) throws Exception {
 		if ("capture".equals(_methodName)) {
 			this.capture(_dictParas, _scriptEngine, _callbackFuncName);
 			return true;
 		}
 		return super.invokeAsyncMethod(_methodName, _dictParas, _scriptEngine, _callbackFuncName);
 	}
-	
+
 	@Override
-	public void capture(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine,
-			String _callbackFuncName) throws Exception {
+	public void capture(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, String _callbackFuncName) throws Exception {
 		try {
 			DoInvokeResult _invokeResult = new DoInvokeResult(this.getUniqueKey());
 			CameraCaptureListener _myListener = new CameraCaptureListener();
@@ -82,7 +81,7 @@ public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMet
 			DoServiceContainer.getLogEngine().writeError("DoCamera capture \n", _err);
 		}
 	}
-	
+
 	private class CameraCaptureListener implements DoActivityResultListener {
 
 		private final int CameraCode = 10001;
@@ -97,8 +96,7 @@ public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMet
 		private String picTempPath;
 		private DoIPageView activity;
 
-		public void init(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, 
-				DoInvokeResult _invokeResult, String _callbackFuncName) throws Exception {
+		public void init(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult, String _callbackFuncName) throws Exception {
 			this.scriptEngine = _scriptEngine;
 			// 图片宽度
 			this.width = _dictParas.getOneInteger("width", -1);
@@ -132,7 +130,6 @@ public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMet
 					DoServiceContainer.getLogEngine().writeInfo("取消拍照", "info");
 				} else if ((requestCode == CameraCode && resultCode == Activity.RESULT_OK) || (requestCode == CutCode)) {
 					if (this.iscut && requestCode == CameraCode) {
-						this.iscut = false;
 						Intent intentCrop = new Intent("com.android.camera.action.CROP");
 						intentCrop.setDataAndType(imageUri, "image/*");
 						intentCrop.putExtra("crop", "true");
@@ -143,33 +140,38 @@ public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMet
 						intentCrop.putExtra("outputX", this.width);
 						intentCrop.putExtra("outputY", this.height);
 						intentCrop.putExtra("scale", true);
-						intentCrop.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+						intentCrop.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/temp.jpg")));
 						intentCrop.putExtra("return-data", false);
 						intentCrop.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
 						intentCrop.putExtra("noFaceDetection", true);
-						((Activity) activity).startActivityForResult(intentCrop, CameraCode);
+						((Activity) activity).startActivityForResult(intentCrop, CutCode);
 					} else {
-						new CameraSaveTask(activity,this,callbackFuncName).execute(new String[]{});
+						String bitmapPath = imageUri.getPath();
+						if(this.iscut){
+							bitmapPath = Environment.getExternalStorageDirectory() + "/temp.jpg";
+						}
+						new CameraSaveTask(activity, this, callbackFuncName,bitmapPath).execute(new String[] {});
 					}
 				}
 			} catch (Exception _err) {
 				DoServiceContainer.getLogEngine().writeError("do_Camera_Model", _err);
 			}
 		}
-		
-		
-		class CameraSaveTask extends AsyncTask<String, Void, String>{
-			
+
+		class CameraSaveTask extends AsyncTask<String, Void, String> {
+
 			private String callbackFuncName;
 			private DoIPageView activity;
 			private DoActivityResultListener doActivityResultListener;
-			
-			public CameraSaveTask(DoIPageView activity,DoActivityResultListener resultListener, String callbackFuncName) {
+			private String bitmapPath;
+
+			public CameraSaveTask(DoIPageView activity, DoActivityResultListener resultListener, String callbackFuncName, String bitmapPath) {
 				this.callbackFuncName = callbackFuncName;
 				this.activity = activity;
 				this.doActivityResultListener = resultListener;
+				this.bitmapPath = bitmapPath;
 			}
-			
+
 			@Override
 			protected String doInBackground(String... params) {
 				DoInvokeResult invokeResult = new DoInvokeResult(getUniqueKey());
@@ -178,8 +180,8 @@ public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMet
 				String _fileFullName = scriptEngine.getCurrentApp().getDataFS().getRootPath() + "/temp/do_Camera/" + _fileName;
 				Bitmap bitmap = null;
 				try {
-					bitmap = DoImageHandleHelper.resizeScaleImage(imageUri.getPath(), width, height);
-					if(bitmap != null){
+					bitmap = DoImageHandleHelper.resizeScaleImage(this.bitmapPath, width, height);
+					if (bitmap != null) {
 						bitmap.compress(Bitmap.CompressFormat.PNG, quality, photo_data);
 					}
 					DoIOHelper.writeAllBytes(_fileFullName, photo_data.toByteArray());
@@ -191,7 +193,7 @@ public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMet
 				} catch (Exception _err) {
 					DoServiceContainer.getLogEngine().writeError("do_Camera_Model", _err);
 				} finally {
-					if(bitmap != null){
+					if (bitmap != null) {
 						bitmap.recycle();
 						bitmap = null;
 					}
