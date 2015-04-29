@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-src/android/doExt_do_Device/AndroidManifest.xml
-=======
 *.class
 *.apk
 bin/
@@ -9,4 +5,3 @@ gen/
 .settings/
 proguard/
 *.classpath
->>>>>>> 3ae334a8bb4cdffb4141b88a78149d30887fecec
