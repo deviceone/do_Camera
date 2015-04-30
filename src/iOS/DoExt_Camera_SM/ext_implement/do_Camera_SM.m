@@ -170,12 +170,12 @@
             //写入本地
             NSString * dataFSRootPath = _myScriptEngine.CurrentApp.DataFS.RootPath;
             NSString * fileName = [NSString stringWithFormat:@"%@.png",[doUIModuleHelper stringWithUUID]];
-            NSString * filePath = [NSString stringWithFormat:@"%@/temp",dataFSRootPath];
+            NSString * filePath = [NSString stringWithFormat:@"%@/temp/do_Camera",dataFSRootPath];
             NSString * fileFullName = [NSString stringWithFormat:@"%@/%@",filePath,fileName];
             if(![doIOHelper ExistDirectory:filePath])
                 [doIOHelper CreateDirectory:filePath];
             [doIOHelper WriteAllBytes:fileFullName :imageData];
-            [_myInvokeResult SetResultText:[NSString stringWithFormat:@"data://temp/%@",fileName]];
+            [_myInvokeResult SetResultText:[NSString stringWithFormat:@"data://temp/do_Camera/%@",fileName]];
         }
         @catch (NSException *exception) {
             [_myInvokeResult SetException:exception];
