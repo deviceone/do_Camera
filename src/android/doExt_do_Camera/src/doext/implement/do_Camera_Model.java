@@ -182,7 +182,7 @@ public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMet
 				try {
 					bitmap = DoImageHandleHelper.resizeScaleImage(this.bitmapPath, width, height);
 					if (bitmap != null) {
-						bitmap.compress(Bitmap.CompressFormat.PNG, quality, photo_data);
+						bitmap.compress(Bitmap.CompressFormat.JPEG, quality, photo_data);
 					}
 					DoIOHelper.writeAllBytes(_fileFullName, photo_data.toByteArray());
 					String _url = "data://temp/do_Camera/" + _fileName;
