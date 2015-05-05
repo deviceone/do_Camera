@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A4917C4B1A78940200FFB148 /* do_Camera_SM.m in Sources */ = {isa = PBXBuildFile; fileRef = A4917C4A1A78940200FFB148 /* do_Camera_SM.m */; };
+		CC16C36B1AF8DB29006D71B0 /* do_Camera_App.m in Sources */ = {isa = PBXBuildFile; fileRef = CC16C36A1AF8DB29006D71B0 /* do_Camera_App.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -83,6 +84,8 @@
 		CC16C3661AF8B40F006D71B0 /* doUIModuleCollection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = doUIModuleCollection.h; sourceTree = "<group>"; };
 		CC16C3671AF8B40F006D71B0 /* doUIModuleHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = doUIModuleHelper.h; sourceTree = "<group>"; };
 		CC16C3681AF8B40F006D71B0 /* NSData+DoBase64.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSData+DoBase64.h"; sourceTree = "<group>"; };
+		CC16C3691AF8DB29006D71B0 /* do_Camera_App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = do_Camera_App.h; sourceTree = "<group>"; };
+		CC16C36A1AF8DB29006D71B0 /* do_Camera_App.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = do_Camera_App.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +110,8 @@
 		A4917C481A78940200FFB148 /* ext_implement */ = {
 			isa = PBXGroup;
 			children = (
+				CC16C3691AF8DB29006D71B0 /* do_Camera_App.h */,
+				CC16C36A1AF8DB29006D71B0 /* do_Camera_App.m */,
 				A4917C491A78940200FFB148 /* do_Camera_SM.h */,
 				A4917C4A1A78940200FFB148 /* do_Camera_SM.m */,
 			);
@@ -252,6 +257,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A4917C4B1A78940200FFB148 /* do_Camera_SM.m in Sources */,
+				CC16C36B1AF8DB29006D71B0 /* do_Camera_App.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
