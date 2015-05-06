@@ -159,17 +159,12 @@
                 size = CGSizeMake(size.width, imageHeight);
             image = [doUIModuleHelper imageWithImageSimple:image scaledToSize:size];
             
-            if(UIImagePNGRepresentation(image) == nil)
-            {
-                imageData = UIImageJPEGRepresentation(image, imageQuality / 100.0);
-            }else{
-                imageData = UIImagePNGRepresentation(image);
-            }
-            image = [UIImage imageWithData:imageData];
-            
+            if(imageQuality<0) imageQuality = 1;
+            if(imageQuality>100)imageQuality = 100;
+            imageData = UIImageJPEGRepresentation(image, imageQuality / 100.0);
             //写入本地
             NSString * dataFSRootPath = _myScriptEngine.CurrentApp.DataFS.RootPath;
-            NSString * fileName = [NSString stringWithFormat:@"%@.png",[doUIModuleHelper stringWithUUID]];
+            NSString * fileName = [NSString stringWithFormat:@"%@.jpg",[doUIModuleHelper stringWithUUID]];
             NSString * filePath = [NSString stringWithFormat:@"%@/temp/do_Camera",dataFSRootPath];
             NSString * fileFullName = [NSString stringWithFormat:@"%@/%@",filePath,fileName];
             if(![doIOHelper ExistDirectory:filePath])

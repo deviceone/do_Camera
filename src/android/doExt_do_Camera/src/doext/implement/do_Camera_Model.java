@@ -126,7 +126,7 @@ public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMet
 		public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 			try {
 				// 回调
-				if (requestCode == CameraCode && resultCode == Activity.RESULT_CANCELED) { // 取消
+				if ((requestCode == CameraCode || requestCode == CutCode) && resultCode == Activity.RESULT_CANCELED) { // 取消
 					DoServiceContainer.getLogEngine().writeInfo("取消拍照", "info");
 				} else if ((requestCode == CameraCode && resultCode == Activity.RESULT_OK) || (requestCode == CutCode)) {
 					if (this.iscut && requestCode == CameraCode) {
@@ -134,11 +134,16 @@ public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMet
 						intentCrop.setDataAndType(imageUri, "image/*");
 						intentCrop.putExtra("crop", "true");
 						// aspectX aspectY 是宽高的比例
-						intentCrop.putExtra("aspectX", 1);
-						intentCrop.putExtra("aspectY", 1);
+						if (this.width <= 0 || this.height <= 0) {
+							intentCrop.putExtra("aspectX", 1);
+							intentCrop.putExtra("aspectY", 1);
+						} else {
+							intentCrop.putExtra("aspectX", this.width);
+							intentCrop.putExtra("aspectY", this.height);
+						}
 						// outputX outputY 是裁剪图片宽高
-						intentCrop.putExtra("outputX", this.width);
-						intentCrop.putExtra("outputY", this.height);
+//						intentCrop.putExtra("outputX", this.width);
+//						intentCrop.putExtra("outputY", this.height);
 						intentCrop.putExtra("scale", true);
 						intentCrop.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/temp.jpg")));
 						intentCrop.putExtra("return-data", false);
@@ -147,10 +152,10 @@ public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMet
 						((Activity) activity).startActivityForResult(intentCrop, CutCode);
 					} else {
 						String bitmapPath = imageUri.getPath();
-						if(this.iscut){
+						if (this.iscut) {
 							bitmapPath = Environment.getExternalStorageDirectory() + "/temp.jpg";
 						}
-						new CameraSaveTask(activity, this, callbackFuncName,bitmapPath).execute(new String[] {});
+						new CameraSaveTask(activity, this, callbackFuncName, bitmapPath).execute(new String[] {});
 					}
 				}
 			} catch (Exception _err) {
@@ -182,7 +187,7 @@ public class do_Camera_Model extends DoSingletonModule implements do_Camera_IMet
 				try {
 					bitmap = DoImageHandleHelper.resizeScaleImage(this.bitmapPath, width, height);
 					if (bitmap != null) {
-						bitmap.compress(Bitmap.CompressFormat.PNG, quality, photo_data);
+						bitmap.compress(Bitmap.CompressFormat.JPEG, quality, photo_data);
 					}
 					DoIOHelper.writeAllBytes(_fileFullName, photo_data.toByteArray());
 					String _url = "data://temp/do_Camera/" + _fileName;
