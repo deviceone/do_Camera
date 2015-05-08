@@ -153,10 +153,21 @@
             }
             
             CGSize size = CGSizeMake([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width*(image.size.height/image.size.width));
-            if(imageWidth>0)
-                size = CGSizeMake(imageWidth, size.height);
-            if(imageHeight>0)
-                size = CGSizeMake(size.width, imageHeight);
+            if (-1 == imageHeight && -1 == imageWidth) {//保持原始比例
+                size = CGSizeMake(imageWidth, imageHeight);
+            }
+            else
+            {
+                if(-1 == imageWidth)
+                {
+                    size = CGSizeMake(imageWidth, size.height);
+                }
+                if(-1 == imageHeight)
+                {
+                    size = CGSizeMake(size.width, imageHeight);
+                }
+            }
+
             image = [doUIModuleHelper imageWithImageSimple:image scaledToSize:size];
             
             if(imageQuality<0) imageQuality = 1;
