@@ -10,7 +10,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 
-#import "doJsonNode.h"
+#import "doJsonHelper.h"
 #import "doServiceContainer.h"
 #import "doILogEngine.h"
 #import "doIApp.h"
@@ -39,9 +39,9 @@
 #pragma mark - 同步异步方法的实现
 /*
  1.参数节点
- doJsonNode *_dictParas = [parms objectAtIndex:0];
+ NSDictionary *_dictParas = [parms objectAtIndex:0];
  在节点中，获取对应的参数
- NSString *title = [_dictParas GetOneText:@"title" :@"" ];
+ NSString *title = [doJsonHelper GetOneText: _dictParas :@"title" :@"" ];
  说明：第一个参数为对象名，第二为默认值
  
  2.脚本运行时的引擎
@@ -67,20 +67,20 @@
 #pragma mark - 实现异步方法
 - (void)capture:(NSArray *)params
 {
-    doJsonNode * _dicParas = [params objectAtIndex:0];
+    NSDictionary * _dicParas = [params objectAtIndex:0];
     self.myScriptEngine = [params objectAtIndex:1];
     self.myCallbackFuncName = [params objectAtIndex:2];
     self.myInvokeResult = [[doInvokeResult alloc]init:nil];
     //图片宽度
-    imageWidth = [_dicParas GetOneInteger:@"width" :-1];
+    imageWidth = [doJsonHelper GetOneInteger: _dicParas :@"width" :-1];
     //图片高度
-    imageHeight = [_dicParas GetOneInteger:@"height" :-1];
+    imageHeight = [doJsonHelper GetOneInteger: _dicParas :@"height" :-1];
     //清晰度1-100
-    imageQuality = [_dicParas GetOneInteger:@"quality" :100];
+    imageQuality = [doJsonHelper GetOneInteger: _dicParas :@"quality" :100];
     imageQuality = imageQuality > 100 ? 100 : imageQuality;
     imageQuality = imageQuality < 1 ? 1 : imageQuality;
     //是否启动中间裁剪界面
-    isCut = [_dicParas GetOneBoolean:@"iscut" :NO];
+    isCut = [doJsonHelper GetOneBoolean: _dicParas :@"iscut" :NO];
     
     if(pickerVC == nil)
     {
